@@ -1,0 +1,6 @@
+# Envirment directory
+venv/
+
+
+# Secret files
+/plan.txt

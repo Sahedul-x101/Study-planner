@@ -3,13 +3,22 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    <link rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+
     <title>Study Planner</title>
 </head>
 {% comment %} m means margin {% endcomment %}
 <body class="m-6">
     <header>
         <nav>
-            
+            <div class="flex flex-row">
+                <div>
+                    <h1 class="text-2xl">Study Planner</h1>
+                </div>
+                <a href="#"><i class="fa-solid fa-list-check"></i>Tasks</a>
+                <a href="#">Timer</a>
+            </div>
         </nav>
     </header>
 

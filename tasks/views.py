@@ -16,13 +16,10 @@ def create_tasks(request):
                 description = description,
                 completed = completed
             )
-
-            if task.completed:
-                task.delete()
             
     return render(request, 'tasks/task.html')
 
 def view_tasks(request):
     tasks = Task.objects.all()
-    return render(request, 'tasks/task.html', {'tasks':tasks})
+    return render(request, 'tasks/taskView.html', {'tasks':tasks})
     

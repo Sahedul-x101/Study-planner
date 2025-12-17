@@ -19,9 +19,9 @@ from django.urls import path, include
 from django.conf import settings
 
 urlpatterns = [
-    path('admin/', admin.site.urls),
-    path('core/', include('core.urls')),
-    path('tasks/', include('tasks.urls'))
+    path('', include('core.urls')),
+    path('tasks/', include('tasks.urls')),
+    path('admin/', admin.site.urls)
 ] 
 if settings.DEBUG:
     import debug_toolbar

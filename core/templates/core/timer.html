@@ -1,0 +1,68 @@
+{% extends "core/base.html" %}
+{% block title %}Study Planner | Timer{% endblock title %}
+
+{% block content %}
+<body class="bg-gray-100 flex items-center justify-center h-screen">
+
+  <div class="bg-white p-8 rounded-2xl shadow-xl text-center">
+    <h1 class="text-3xl font-bold mb-6 hover:underline hover:text-green-500 font-mono">Countdown Timer</h1>
+    <div id="timer" class="text-5xl font-mono text-gray-700 mb-10">25:00</div>
+    <div class="space-x-4">
+      <button id="startBtn" class="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded">Start</button>
+      <button id="pauseBtn" class="bg-yellow-500 hover:bg-yellow-600 text-white px-4 py-2 rounded">Pause</button>
+      <button id="resetBtn" class="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded">Reset</button>
+    </div>
+  </div>
+
+  <script>
+    let time = 1500; // countdown time in seconds
+    let timerId = null;
+
+    const timerDisplay = document.getElementById('timer');
+    const startBtn = document.getElementById('startBtn');
+    const pauseBtn = document.getElementById('pauseBtn');
+    const resetBtn = document.getElementById('resetBtn');
+
+    function updateDisplay() {
+      const minutes = Math.floor(time / 60).toString().padStart(2, '0');
+      const seconds = (time % 60).toString().padStart(2, '0');
+      timerDisplay.textContent = `${minutes}:${seconds}`;
+    }
+
+    function startTimer() {
+      if (timerId) return; // prevent multiple intervals
+      timerId = setInterval(() => {
+        if (time > 0) {
+          time--;
+          updateDisplay();
+        } else {
+          clearInterval(timerId);
+          timerId = null;
+          alert("Time's up!");
+        }
+      }, 1000);
+    }
+
+    function pauseTimer() {
+      clearInterval(timerId);
+      timerId = null;
+    }
+
+    function resetTimer() {
+      pauseTimer();
+      time = 1500; // reset to initial time
+      updateDisplay();
+    }
+
+    startBtn.addEventListener('click', startTimer);
+    pauseBtn.addEventListener('click', pauseTimer);
+    resetBtn.addEventListener('click', resetTimer);
+
+    // Initialize display
+    updateDisplay();
+  </script>
+
+</body>
+
+{% endblock content %}
+

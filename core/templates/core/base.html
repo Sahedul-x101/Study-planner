@@ -5,31 +5,50 @@
     <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
     <link rel="stylesheet"
       href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <title> {% block title %} Study Planner | Dashboard{% endblock title %}</title>
 
-    <title>Study Planner</title>
 </head>
 {% comment %} m means margin {% endcomment %}
-<body class="m-6">
-    <header>
-        <nav>
-            <div class="flex flex-row">
-                <div>
-                    <h1 class="text-2xl">Study Planner</h1>
-                </div>
-                <a href="#"><i class="fa-solid fa-list-check"></i>Tasks</a>
-                <a href="#">Timer</a>
+<body class="bg-gray-100 font-inter">
+
+    <!-- Header -->
+    <header class="shadow bg-white px-4 py-4">
+        <nav class="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-3 sm:gap-0">
+            
+            <!-- Logo -->
+            <div class="text-center sm:text-left flex-1">
+                <h1 class="text-3xl text-gray-500 font-bold" style="font-family: 'Poppins', sans-serif;">
+                    Study Planner
+                </h1>
             </div>
+
+            <!-- Menu -->
+            <div class="flex flex-wrap justify-center gap-4 sm:gap-6 flex-1">
+                <a href="{% url 'home' %}" class="px-2 py-1 {% if request.resolver_match.url_name == 'home' %} text-green-500 border-b-2 border-green-500 {% else %} hover:text-blue-500 hover:underline {% endif %}">Dashboard</a>
+                <a href="{% url 'task_list' %}" class="px-2 py-1 {% if request.resolver_match.url_name == 'task_list' %} text-green-500 border-b-2 border-green-500 {% else %} hover:text-blue-500 hover:underline {% endif %}">Tasks</a>
+                <a href="{% url 'timer' %}" class="px-2 py-1 {% if request.resolver_match.url_name == 'timer' %} text-green-500 border-b-2 border-green-500 {% else %} hover:text-blue-500 hover:underline {% endif %}">Timer</a>
+                <a href="/admin/" class="px-2 py-1 hover:text-blue-500 hover:underline">Admin</a>
+            </div>
+
+            <!-- Login Button -->
+            <div class="text-center sm:text-right flex-1">
+                <a href="#" class="inline-block border border-gray-400 bg-green-600 text-white rounded px-3 py-1 hover:bg-white hover:text-blue-500 hover:underline transition-colors">
+                    Login
+                </a>
+            </div>
+
         </nav>
     </header>
 
-    <main>
+    <main class="m-6">
         {% block content %}
         
         {% endblock content %}
     </main>
-    <footer>
-
-    </footer>
+    {% comment %} <footer class="w-full bg-white border-t border-gray-200 text-gray-500 text-center py-3">
+        © 2025 Study Planner. All rights reserved.
+    </footer> {% endcomment %}
     
 </body>
 </html>

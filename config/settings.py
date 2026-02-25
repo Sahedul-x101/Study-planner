@@ -81,13 +81,21 @@ WSGI_APPLICATION = 'config.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/6.0/ref/settings/#databases
 
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
-    }
-}
+# DATABASES = {
+#     'default': {
+#         'ENGINE': 'django.db.backends.sqlite3',
+#         'NAME': BASE_DIR / 'db.sqlite3',
+#     }
+# }
 
+# Replace the SQLite DATABASES configuration with PostgreSQL:
+DATABASES = {
+    'default': dj_database_url.config(
+        # Replace this value with your local database's connection string.
+        default='postgresql://study_planner_db_n0z5_user:V4df1HlI5Jcv26jT9H3zVBmhHeLnAFYV@dpg-d6fjjf8gjchc73f1fclg-a.oregon-postgres.render.com/study_planner_db_n0z5',
+        conn_max_age=600
+    )
+}
 
 
 # Password validation

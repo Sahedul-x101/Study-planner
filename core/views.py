@@ -1,36 +1,3 @@
-# from django.shortcuts import render
-# from tasks.models import Task
-# from datetime import datetime, timedelta
-# # Create your views here.
-
-# def home(request):
-#     today = datetime.today()
-#     days_since_sunday = (today.weekday() + 1) % 7
-#     start_week = today - timedelta(days=days_since_sunday)
-#     week_days = []
-
-#     for i in range(7):
-#         day = start_week + timedelta(days=i)
-#         tasks = Task.objects.filter(due_date=day.date(), completed = False)
-#         week_days.append({"date":day, "day_name": day.strftime("%a"),"tasks":tasks})
-
-#     # Task stats
-#     tasks = Task.objects.all()
-#     total_tasks = tasks.count()
-#     completed_tasks = Task.objects.filter(completed=True).count()
-#     pending_tasks = Task.objects.filter(completed=False).count()
-    
-#     top_tasks = Task.objects.filter(completed=False).order_by('-created_at')[:3]
-
-#     return render(request, "core/dashboard.html", {"total_tasks":total_tasks, "completed_tasks":completed_tasks, "pending_tasks":pending_tasks,
-#     "top_tasks": top_tasks,
-#     "week_days": week_days,
-#     })
-
-# def timer(request):
-#     return render(request, "core/timer.html")
-
-
 from django.shortcuts import render, redirect
 from tasks.models import Task
 from datetime import datetime, timedelta
@@ -38,22 +5,26 @@ from collections import defaultdict
 from django.db.models import Count, Q
 from django.contrib.auth.decorators import login_required
 
+
 @login_required
 def home(request):
     today = datetime.today()
 
-    # ---- Week range for calendar (Sunday → Saturday) ----
+    # ---- Week range (Sunday → Saturday) ----
     days_since_sunday = (today.weekday() + 1) % 7
     start_week = today - timedelta(days=days_since_sunday)
     end_week = start_week + timedelta(days=6)
 
-    # ---- Weekly tasks for calendar (only incomplete) ----
-    week_tasks = Task.objects.filter(
+    # Only current user's tasks
+    user_tasks = Task.objects.filter(user=request.user)
+
+    # ---- Weekly tasks (only incomplete + user specific) ----
+    week_tasks = user_tasks.filter(
         due_date__range=(start_week.date(), end_week.date()),
         completed=False
     ).only('id', 'title', 'priority', 'due_date')
 
-    # ---- Group tasks by date for calendar ----
+    # ---- Group by date ----
     tasks_by_date = defaultdict(list)
     for task in week_tasks:
         tasks_by_date[task.due_date].append(task)
@@ -67,21 +38,21 @@ def home(request):
         for i in range(7)
     ]
 
-    # ---- Task statistics (aggregate in a single query) ----
-    stats = Task.objects.aggregate(
+    # ---- Statistics (USER ONLY) ----
+    stats = user_tasks.aggregate(
         total=Count('id'),
         completed=Count('id', filter=Q(completed=True))
     )
+
     total_tasks = stats['total']
     completed_tasks = stats['completed']
     pending_tasks = total_tasks - completed_tasks
 
-    # ---- Top 3 recent incomplete tasks ----
-    top_tasks = Task.objects.filter(completed=False)\
+    # ---- Top 3 recent incomplete tasks (USER ONLY) ----
+    top_tasks = user_tasks.filter(completed=False)\
         .only('id','title','priority','created_at','description','due_date','duration')\
         .order_by('-created_at')[:3]
 
-    # ---- Render template ----
     return render(request, "core/dashboard.html", {
         "total_tasks": total_tasks,
         "completed_tasks": completed_tasks,

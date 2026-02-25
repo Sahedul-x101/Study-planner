@@ -6,36 +6,73 @@
     <style>
         body {
             font-family: Arial, sans-serif;
+            background-color: #f3f4f6; /* light gray like task_list background */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+        }
+
+        .card {
+            background-color: #ffffff;
+            border: 1px solid #e5e7eb;
+            border-radius: 16px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            padding: 40px 30px;
+            max-width: 400px;
+            width: 100%;
             text-align: center;
-            padding: 50px;
-            background-color: #f5f5f5;
         }
+
         h1 {
-            color: #333;
+            font-size: 2rem;
+            font-weight: bold;
+            color: #111827;
+            margin-bottom: 10px;
         }
-        .buttons {
-            margin-top: 30px;
+
+        p {
+            color: #6b7280;
+            margin-bottom: 30px;
         }
-        a {
+
+        .buttons a {
+            display: inline-block;
             text-decoration: none;
             color: white;
-            background-color: #007bff;
-            padding: 10px 20px;
+            background-color: #10b981; /* green like task buttons */
+            padding: 12px 25px;
             margin: 0 10px;
-            border-radius: 5px;
+            border-radius: 12px;
             font-weight: bold;
+            transition: background-color 0.2s ease;
         }
-        a:hover {
-            background-color: #0056b3;
+
+        .buttons a:hover {
+            background-color: #059669;
+        }
+
+        @media (max-width: 500px) {
+            .card {
+                padding: 30px 20px;
+            }
+
+            .buttons a {
+                display: block;
+                margin: 10px 0;
+            }
         }
     </style>
 </head>
 <body>
-    <h1>Welcome to Study Planner</h1>
-    <p>Organize your tasks, notes, and study time efficiently.</p>
-    <div class="buttons">
-        <a href="{% url 'login' %}">Login</a>
-        <a href="{% url 'register' %}">Register</a>
+    <div class="card">
+        <h1>Welcome to Study Planner</h1>
+        <p>Organize your tasks, notes, and study time efficiently.</p>
+        <div class="buttons">
+            <a href="{% url 'login' %}">Login</a>
+            <a href="{% url 'register' %}">Register</a>
+        </div>
     </div>
 </body>
 </html>

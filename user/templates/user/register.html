@@ -1,7 +1,87 @@
-<h2>Register</h2>
-<form method="post" action="{% url 'register' %}">
-    {% csrf_token %}
-    {{ form.as_p }}
-    <button type="submit">Register</button>
-</form>
-<a href="{% url 'login' %}">Already have an account? Login</a>
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Register | Study Planner</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100 flex items-center justify-center min-h-screen">
+
+    <div class="bg-white shadow-md border border-gray-200 rounded-2xl p-8 w-full max-w-md">
+        <h2 class="text-2xl font-bold text-gray-800 text-center mb-4">Create Your Account</h2>
+        <p class="text-gray-500 text-sm text-center mb-6">Join Study Planner to organize your tasks</p>
+
+        {% if form.errors %}
+        <div class="bg-red-100 text-red-700 p-3 rounded mb-4 text-sm text-center">
+            Please fix the errors below
+        </div>
+        {% endif %}
+
+        {% if messages %}
+            {% for message in messages %}
+                <div class="bg-green-100 text-green-700 p-3 rounded mb-4 text-sm text-center">
+                    {{ message }}
+                </div>
+            {% endfor %}
+        {% endif %}
+
+        <form method="post" action="{% url 'register' %}" class="space-y-4">
+            {% csrf_token %}
+
+            <!-- Username -->
+            <div>
+                <label class="block text-gray-700 font-medium mb-1">Username</label>
+                <input type="text" name="username" value="{{ form.username.value|default_if_none:'' }}" required
+                       class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500">
+                {% for error in form.username.errors %}
+                    <p class="text-red-600 text-sm mt-1">{{ error }}</p>
+                {% endfor %}
+            </div>
+
+            <!-- Email -->
+            <div>
+                <label class="block text-gray-700 font-medium mb-1">Email</label>
+                <input type="email" name="email" value="{{ form.email.value|default_if_none:'' }}" required
+                       class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500">
+                {% for error in form.email.errors %}
+                    <p class="text-red-600 text-sm mt-1">{{ error }}</p>
+                {% endfor %}
+            </div>
+
+            <!-- Password -->
+            <div>
+                <label class="block text-gray-700 font-medium mb-1">Password</label>
+                <input type="password" name="password1" required
+                       class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500">
+                {% for error in form.password1.errors %}
+                    <p class="text-red-600 text-sm mt-1">{{ error }}</p>
+                {% endfor %}
+            </div>
+
+            <!-- Confirm Password -->
+            <div>
+                <label class="block text-gray-700 font-medium mb-1">Confirm Password</label>
+                <input type="password" name="password2" required
+                       class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500">
+                {% for error in form.password2.errors %}
+                    <p class="text-red-600 text-sm mt-1">{{ error }}</p>
+                {% endfor %}
+            </div>
+
+            <button type="submit"
+                    class="w-full bg-green-600 text-white font-medium py-2 rounded-lg hover:bg-green-700 transition">
+                Register
+            </button>
+        </form>
+
+        <p class="mt-4 text-center text-gray-600 text-sm">
+            Already have an account?
+            <a href="{% url 'login' %}" class="text-green-600 font-semibold hover:underline">Login</a>
+        </p>
+    </div>
+
+</body>
+</html>

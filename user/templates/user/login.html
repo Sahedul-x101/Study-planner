@@ -1,17 +1,53 @@
-<h2>Login</h2>
-{% if form.errors %}
-<p style="color:red;">Invalid username or password</p>
-{% endif %}
+{% load static %}
 
-<form method="post">
-    {% csrf_token %}
-    <label>Username:</label>
-    <input type="text" name="username" required><br><br>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login | Study Planner</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100 flex items-center justify-center min-h-screen">
 
-    <label>Password:</label>
-    <input type="password" name="password" required><br><br>
+    <div class="bg-white shadow-md border border-gray-200 rounded-2xl p-8 w-full max-w-md">
+        <h2 class="text-2xl font-bold text-gray-800 text-center mb-4">Login to Study Planner</h2>
+        <p class="text-gray-500 text-sm text-center mb-6">Access your tasks and stay organized</p>
 
-    <input type="hidden" name="next" value="{{ next }}">
-    <button type="submit">Login</button>
-</form>
-<a href="{% url 'register' %}">Create an account</a>
+        {% if form.errors %}
+        <div class="bg-red-100 text-red-700 p-3 rounded mb-4 text-sm text-center">
+            Invalid username or password
+        </div>
+        {% endif %}
+
+        <form method="post" class="space-y-4">
+            {% csrf_token %}
+
+            <div>
+                <label class="block text-gray-700 font-medium mb-1">Username</label>
+                <input type="text" name="username" required
+                       class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500">
+            </div>
+
+            <div>
+                <label class="block text-gray-700 font-medium mb-1">Password</label>
+                <input type="password" name="password" required
+                       class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500">
+            </div>
+
+            <input type="hidden" name="next" value="{{ next }}">
+
+            <button type="submit"
+                    class="w-full bg-green-600 text-white font-medium py-2 rounded-lg hover:bg-green-700 transition">
+                Login
+            </button>
+        </form>
+
+        <p class="mt-4 text-center text-gray-600 text-sm">
+            Don't have an account?
+            <a href="{% url 'register' %}" class="text-green-600 font-semibold hover:underline">Create one</a>
+        </p>
+    </div>
+
+</body>
+</html>

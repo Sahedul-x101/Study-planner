@@ -2,9 +2,9 @@ from django.shortcuts import render, redirect, get_object_or_404
 from tasks.models import Task
 from django.utils import timezone
 from django.contrib.auth.decorators import login_required
+from datetime import datetime
 
 
-# Create your views here.
 @login_required
 def create_tasks(request):
     if request.method == "POST":
@@ -15,15 +15,14 @@ def create_tasks(request):
         priority = request.POST.get('priority', 'medium')
         duration = request.POST.get("duration")
 
+        # Duration handling
         if duration:
             duration = int(duration)
         else:
             duration = None
 
         if due_date_str:
-            due_date = timezone.make_aware(
-                timezone.datetime.strptime(due_date_str, "%Y-%m-%d")
-            )
+            due_date = datetime.strptime(due_date_str, "%Y-%m-%d").date()
         else:
             due_date = None
 
@@ -31,35 +30,44 @@ def create_tasks(request):
 
         if title:
             Task.objects.create(
-                title = title,
-                description = description,
-                completed = completed,
-                completed_at = completed_at,
-                due_date = due_date,
-                priority = priority,
-                duration = duration
+                user=request.user,   
+                title=title,
+                description=description,
+                completed=completed,
+                completed_at=completed_at,
+                due_date=due_date,
+                priority=priority,
+                duration=duration
             )
 
             return redirect("task_list")
 
-            
     return render(request, "tasks/create_task.html")
+
 
 @login_required
 def tasks_list(request):
-    tasks = Task.objects.filter(completed=False).order_by('-created_at')
+    tasks = Task.objects.filter(
+        user=request.user,     
+        completed=False
+    ).order_by('-created_at')
 
-    return render(request, "tasks/task_list.html", {"tasks":tasks, "show_header": True})
+    return render(request, "tasks/task_list.html", {
+        "tasks": tasks,
+        "show_header": True
+    })
 
+
+@login_required
 def mark_complete(request, task_id):
-    task = get_object_or_404(Task, id=task_id)
+    task = get_object_or_404(
+        Task,
+        id=task_id,
+        user=request.user 
+    )
+
     task.completed = True
     task.completed_at = timezone.now()
     task.save()
 
     return redirect(request.META.get('HTTP_REFERER', 'task_list'))
-
-
-    
-
-        

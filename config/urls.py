@@ -23,6 +23,7 @@ urlpatterns = [
     path('tasks/', include('tasks.urls')),
     path('user/', include('user.urls')),
     path('notes/', include('notes.urls')),
+    path('drawing/', include('drawing.urls')),
     path('admin/', admin.site.urls),
 ] 
 if settings.DEBUG:

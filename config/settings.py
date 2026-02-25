@@ -44,6 +44,7 @@ INSTALLED_APPS = [
     'tasks',
     'user',
     'notes',
+    'drawing',
 ]
 
 MIDDLEWARE = [

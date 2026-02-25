@@ -1,0 +1,352 @@
+{% extends "core/base.html" %}
+
+{% block title %}Study Planner | Whiteboard{% endblock %}
+
+{% block content %}
+<div class="max-w-7xl mx-auto px-6 py-8">
+
+    <!-- Header -->
+    <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-10 gap-6">
+        <div>
+            <h2 class="text-4xl font-bold text-gray-800 tracking-tight">
+                Whiteboard
+            </h2>
+            <p class="text-gray-500 mt-2 text-lg">
+                Sketch ideas
+            </p>
+        </div>
+
+        <div class="flex gap-3 flex-wrap">
+            <button onclick="undo()" class="action-btn bg-gray-100 hover:bg-gray-200 text-gray-700">
+                <i class="fa-solid fa-rotate-left"></i>
+            </button>
+
+            <button onclick="clearCanvas()" class="action-btn bg-red-500 hover:bg-red-600 text-white">
+                <i class="fa-solid fa-trash"></i>
+            </button>
+
+            <button onclick="saveImage()" class="action-btn bg-emerald-600 hover:bg-emerald-700 text-white">
+                <i class="fa-solid fa-download"></i>
+            </button>
+        </div>
+    </div>
+
+    <!-- Toolbar -->
+    <div class="glass-card mb-8">
+        <div class="flex flex-wrap items-center gap-8">
+
+            <!-- Tools -->
+            <div class="flex gap-3">
+                <button onclick="setTool('pen')" id="penBtn"
+                    class="tool-btn active-tool">
+                    <i class="fa-solid fa-pen"></i>
+                </button>
+
+                <button onclick="setTool('eraser')" id="eraserBtn"
+                    class="tool-btn">
+                    <i class="fa-solid fa-eraser"></i>
+                </button>
+
+                <button onclick="setTool('rectangle')" id="rectangleBtn"
+                    class="tool-btn">
+                    <i class="fa-regular fa-square"></i>
+                </button>
+
+                <button onclick="setTool('circle')" id="circleBtn"
+                    class="tool-btn">
+                    <i class="fa-regular fa-circle"></i>
+                </button>
+            </div>
+
+            <div class="divider"></div>
+
+            <!-- Color Picker -->
+            <div class="flex items-center gap-4">
+                <div class="icon-label">
+                    <i class="fa-solid fa-palette"></i>
+                </div>
+                <div class="color-wrapper">
+                    <input type="color" id="colorPicker" value="#000000">
+                </div>
+            </div>
+
+            <!-- Size Slider -->
+            <div class="flex items-center gap-4 ">
+                <div class="icon-label">
+                    <i class="fa-solid fa-brush"></i>
+                </div>
+                <div class="slider-wrapper">
+                    <input type="range" id="sizePicker" min="1" max="40" value="10">
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- Canvas -->
+    <div class="canvas-card">
+        <div class="relative w-full">
+            <canvas id="canvas"
+                    class="rounded-2xl border border-gray-200 w-full"
+                    height="650"></canvas>
+            <div id="eraserIndicator"></div>
+        </div>
+    </div>
+
+</div>
+
+<style>
+
+/* Cards */
+.glass-card {
+    background: white;
+    border-radius: 24px;
+    padding: 28px;
+    box-shadow: 0 8px 25px rgba(0,0,0,0.05);
+    border: 1px solid #f1f5f9;
+}
+
+.canvas-card {
+    background: white;
+    padding: 20px;
+    border-radius: 28px;
+    box-shadow: 0 12px 30px rgba(0,0,0,0.06);
+    border: 1px solid #f1f5f9;
+}
+
+/* Action Buttons */
+.action-btn {
+    padding: 12px;
+    border-radius: 14px;
+    font-size: 16px;
+    transition: all 0.2s ease;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+}
+.action-btn:hover { transform: translateY(-2px); }
+
+/* Tool Buttons */
+.tool-btn {
+    padding: 12px;
+    border-radius: 16px;
+    background: #f3f4f6;
+    font-size: 16px;
+    transition: all 0.25s ease;
+    border: none;
+}
+
+/* REMOVE gray hover when active */
+.tool-btn:hover:not(.active-tool) {
+    background: #e5e7eb;
+    transform: translateY(-1px);
+}
+
+.active-tool {
+    background: linear-gradient(135deg,#2563eb,#1d4ed8);
+    color: white;
+    box-shadow: 0 6px 14px rgba(37,99,235,0.35);
+}
+
+/* Divider */
+.divider {
+    width: 1px;
+    height: 32px;
+    background: #e5e7eb;
+}
+
+/* Icon Label */
+.icon-label {
+    width: 40px;
+    height: 40px;
+    background: #f3f4f6;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 16px;
+    color: #374151;
+}
+
+/* PERFECT ROUND COLOR PICKER */
+.color-wrapper input[type="color"] {
+    border: none;
+    width: 35px;
+    height: 35px;
+    border-radius: 50%;
+    cursor: pointer;
+    padding: 0;
+    background: none;
+    overflow: hidden;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.12);
+}
+
+/* remove square inside */
+.color-wrapper input[type="color"]::-webkit-color-swatch-wrapper {
+    padding: 0;
+}
+.color-wrapper input[type="color"]::-webkit-color-swatch {
+    border: none;
+    border-radius: 50%;
+}
+
+/* Slider */
+.slider-wrapper input[type="range"] {
+    -webkit-appearance: none;
+    width: 180px;
+    height: 8px;
+    border-radius: 20px;
+    background: linear-gradient(to right,#2563eb,#60a5fa);
+    outline: none;
+}
+
+.slider-wrapper input[type="range"]::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    width: 22px;
+    height: 22px;
+    border-radius: 50%;
+    background: white;
+    border: 4px solid #2563eb;
+    cursor: pointer;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+}
+
+/* Eraser Indicator */
+#eraserIndicator {
+    position: absolute;
+    pointer-events: none;
+    border: 2px solid #2563eb;
+    border-radius: 50%;
+    background: rgba(37,99,235,0.12);
+    transform: translate(-50%, -50%);
+    display: none;
+}
+
+</style>
+
+<script>
+const canvas = document.getElementById("canvas");
+const ctx = canvas.getContext("2d");
+const eraserIndicator = document.getElementById("eraserIndicator");
+const sizePicker = document.getElementById("sizePicker");
+const colorPicker = document.getElementById("colorPicker");
+
+let painting = false;
+let tool = "pen";
+let startX, startY;
+let history = [];
+let snapshot = null;
+
+function resizeCanvas() {
+    canvas.width = canvas.parentElement.clientWidth;
+}
+window.addEventListener("resize", resizeCanvas);
+resizeCanvas();
+
+function saveState() { history.push(canvas.toDataURL()); }
+
+function undo() {
+    if (history.length > 1) {
+        history.pop();
+        let img = new Image();
+        img.src = history[history.length - 1];
+        img.onload = () => {
+            ctx.clearRect(0,0,canvas.width,canvas.height);
+            ctx.drawImage(img,0,0);
+        };
+    }
+}
+
+function setTool(selectedTool) {
+    tool = selectedTool;
+    document.querySelectorAll(".tool-btn").forEach(btn =>
+        btn.classList.remove("active-tool")
+    );
+    document.getElementById(selectedTool+"Btn").classList.add("active-tool");
+}
+
+canvas.addEventListener("mousedown", (e) => {
+    painting = true;
+    const rect = canvas.getBoundingClientRect();
+    startX = e.clientX - rect.left;
+    startY = e.clientY - rect.top;
+
+    ctx.lineWidth = sizePicker.value;
+    ctx.strokeStyle = colorPicker.value;
+    ctx.lineCap = "round";
+    snapshot = ctx.getImageData(0,0,canvas.width,canvas.height);
+
+    if (tool === "pen") {
+        ctx.beginPath();
+        ctx.moveTo(startX,startY);
+    }
+    if (tool === "eraser") eraserIndicator.style.display = "block";
+});
+
+canvas.addEventListener("mousemove", (e) => {
+    const rect = canvas.getBoundingClientRect();
+    const x = e.clientX - rect.left;
+    const y = e.clientY - rect.top;
+
+    if (tool === "eraser" && painting) {
+        eraserIndicator.style.width = sizePicker.value*2 + "px";
+        eraserIndicator.style.height = sizePicker.value*2 + "px";
+        eraserIndicator.style.left = x + "px";
+        eraserIndicator.style.top = y + "px";
+    }
+
+    if (!painting) return;
+
+    if (tool === "pen") {
+        ctx.lineTo(x,y);
+        ctx.stroke();
+    }
+
+    if (tool === "eraser") {
+        ctx.save();
+        ctx.globalCompositeOperation = "destination-out";
+        ctx.beginPath();
+        ctx.arc(x,y,sizePicker.value,0,Math.PI*2);
+        ctx.fill();
+        ctx.restore();
+    }
+
+    if (tool === "rectangle" || tool === "circle") {
+        ctx.putImageData(snapshot,0,0);
+        if (tool === "rectangle")
+            ctx.strokeRect(startX,startY,x-startX,y-startY);
+        if (tool === "circle") {
+            const radius = Math.sqrt((x-startX)**2 + (y-startY)**2);
+            ctx.beginPath();
+            ctx.arc(startX,startY,radius,0,Math.PI*2);
+            ctx.stroke();
+        }
+    }
+});
+
+canvas.addEventListener("mouseup", () => {
+    painting = false;
+    eraserIndicator.style.display = "none";
+    saveState();
+});
+
+canvas.addEventListener("mouseleave", () => {
+    painting = false;
+    eraserIndicator.style.display = "none";
+});
+
+function clearCanvas() {
+    ctx.clearRect(0,0,canvas.width,canvas.height);
+    history=[];
+    saveState();
+}
+
+function saveImage() {
+    const link=document.createElement("a");
+    link.download="study-whiteboard.png";
+    link.href=canvas.toDataURL();
+    link.click();
+}
+
+saveState();
+</script>
+
+{% endblock %}

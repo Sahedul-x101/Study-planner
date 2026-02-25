@@ -24,6 +24,10 @@
                 class="nav-link {% if request.resolver_match.url_name == 'note_list' %}active{% endif %}">
                     Notes
                 </a>
+                <a href="{% url 'canvas' %}"
+                   class="nav-link {% if request.resolver_match.url_name == 'canvas' %}active{% endif %}">
+                    Canvas
+                </a>
                 <a href="{% url 'timer' %}"
                    class="nav-link {% if request.resolver_match.url_name == 'timer' %}active{% endif %}">
                     Timer
@@ -61,6 +65,7 @@
             <a href="{% url 'home' %}" class="mobile-link">Dashboard</a>
             <a href="{% url 'task_list' %}" class="mobile-link">Tasks</a>
             <a href="{% url 'note_list' %}" class="mobile-link">Notes</a>
+            <a href="{% url 'canvas' %}" class="mobile-link">Canvas</a>
             <a href="{% url 'timer' %}" class="mobile-link">Timer</a>
             {% if request.user.is_superuser %}
                 <a href="/admin/" class="mobile-link">Admin</a>

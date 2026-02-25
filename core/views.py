@@ -1,31 +1,102 @@
-from django.shortcuts import render
+# from django.shortcuts import render
+# from tasks.models import Task
+# from datetime import datetime, timedelta
+# # Create your views here.
+
+# def home(request):
+#     today = datetime.today()
+#     days_since_sunday = (today.weekday() + 1) % 7
+#     start_week = today - timedelta(days=days_since_sunday)
+#     week_days = []
+
+#     for i in range(7):
+#         day = start_week + timedelta(days=i)
+#         tasks = Task.objects.filter(due_date=day.date(), completed = False)
+#         week_days.append({"date":day, "day_name": day.strftime("%a"),"tasks":tasks})
+
+#     # Task stats
+#     tasks = Task.objects.all()
+#     total_tasks = tasks.count()
+#     completed_tasks = Task.objects.filter(completed=True).count()
+#     pending_tasks = Task.objects.filter(completed=False).count()
+    
+#     top_tasks = Task.objects.filter(completed=False).order_by('-created_at')[:3]
+
+#     return render(request, "core/dashboard.html", {"total_tasks":total_tasks, "completed_tasks":completed_tasks, "pending_tasks":pending_tasks,
+#     "top_tasks": top_tasks,
+#     "week_days": week_days,
+#     })
+
+# def timer(request):
+#     return render(request, "core/timer.html")
+
+
+from django.shortcuts import render, redirect
 from tasks.models import Task
 from datetime import datetime, timedelta
-# Create your views here.
+from collections import defaultdict
+from django.db.models import Count, Q
+from django.contrib.auth.decorators import login_required
 
+@login_required
 def home(request):
     today = datetime.today()
+
+    # ---- Week range for calendar (Sunday → Saturday) ----
     days_since_sunday = (today.weekday() + 1) % 7
     start_week = today - timedelta(days=days_since_sunday)
-    week_days = []
+    end_week = start_week + timedelta(days=6)
 
-    for i in range(7):
-        day = start_week + timedelta(days=i)
-        tasks = Task.objects.filter(due_date=day.date(), completed = False)
-        week_days.append({"date":day, "day_name": day.strftime("%a"),"tasks":tasks})
+    # ---- Weekly tasks for calendar (only incomplete) ----
+    week_tasks = Task.objects.filter(
+        due_date__range=(start_week.date(), end_week.date()),
+        completed=False
+    ).only('id', 'title', 'priority', 'due_date')
 
-    # Task stats
-    tasks = Task.objects.all()
-    total_tasks = tasks.count()
-    completed_tasks = Task.objects.filter(completed=True).count()
-    pending_tasks = Task.objects.filter(completed=False).count()
-    
-    top_tasks = Task.objects.filter(completed=False).order_by('-created_at')[:3]
+    # ---- Group tasks by date for calendar ----
+    tasks_by_date = defaultdict(list)
+    for task in week_tasks:
+        tasks_by_date[task.due_date].append(task)
 
-    return render(request, "core/dashboard.html", {"total_tasks":total_tasks, "completed_tasks":completed_tasks, "pending_tasks":pending_tasks,
-    "top_tasks": top_tasks,
-    "week_days": week_days,
+    week_days = [
+        {
+            "date": (day := start_week + timedelta(days=i)),
+            "day_name": day.strftime("%a"),
+            "tasks": tasks_by_date.get(day.date(), [])
+        }
+        for i in range(7)
+    ]
+
+    # ---- Task statistics (aggregate in a single query) ----
+    stats = Task.objects.aggregate(
+        total=Count('id'),
+        completed=Count('id', filter=Q(completed=True))
+    )
+    total_tasks = stats['total']
+    completed_tasks = stats['completed']
+    pending_tasks = total_tasks - completed_tasks
+
+    # ---- Top 3 recent incomplete tasks ----
+    top_tasks = Task.objects.filter(completed=False)\
+        .only('id','title','priority','created_at','description','due_date','duration')\
+        .order_by('-created_at')[:3]
+
+    # ---- Render template ----
+    return render(request, "core/dashboard.html", {
+        "total_tasks": total_tasks,
+        "completed_tasks": completed_tasks,
+        "pending_tasks": pending_tasks,
+        "top_tasks": top_tasks,
+        "week_days": week_days,
+        "show_header": True,
     })
 
+@login_required
 def timer(request):
-    return render(request, "core/timer.html")
+    return render(request, "core/timer.html", {"show_header": True})
+
+
+def landing_view(request):
+    if request.user.is_authenticated:
+        return redirect('home')  # sends logged-in users to dashboard
+    return render(request, "core/landing.html")

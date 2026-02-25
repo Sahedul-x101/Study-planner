@@ -1,8 +1,9 @@
 from django.urls import path
-from core.views import home, timer
+from core.views import home, timer, landing_view
 
 urlpatterns = [
-    path("", home, name="home"),
-    path("timer/", timer, name="timer")
+    path('', landing_view, name='landing'), 
+    path("home/", home, name="home"),
+    path("timer/", timer, name="timer"),
 ]
 

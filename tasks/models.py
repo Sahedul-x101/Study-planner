@@ -13,7 +13,7 @@ class Task(models.Model):
     description = models.TextField(blank=True)
     completed = models.BooleanField(default=False)
     completed_at = models.DateTimeField(blank=True, null=True)  
-    due_date = models.DateTimeField(blank=True, null=True)
+    due_date = models.DateField(blank=True, null=True)
     priority = models.CharField(
         max_length=6,
         choices=PRIORITY_CHOICES,
@@ -25,5 +25,5 @@ class Task(models.Model):
     def __str__(self):
         return self.title
 
-    
+
 

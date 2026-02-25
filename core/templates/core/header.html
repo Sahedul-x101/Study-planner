@@ -1,0 +1,122 @@
+<header class="bg-white shadow-sm border-b border-gray-200">
+    <nav class="max-w-7xl mx-auto px-4 py-3">
+
+        <!-- Top Row -->
+        <div class="flex items-center justify-between">
+
+            <!-- Logo -->
+            <h1 class="text-2xl sm:text-3xl font-bold text-gray-700"
+                style="font-family: 'Poppins', sans-serif;">
+                Study Planner
+            </h1>
+
+            <!-- Desktop Menu -->
+            <div class="hidden sm:flex items-center gap-6">
+                <a href="{% url 'home' %}"
+                   class="nav-link {% if request.resolver_match.url_name == 'home' %}active{% endif %}">
+                    Dashboard
+                </a>
+                <a href="{% url 'task_list' %}"
+                   class="nav-link {% if request.resolver_match.url_name == 'task_list' %}active{% endif %}">
+                    Tasks
+                </a>
+                <a href="{% url 'note_list' %}"
+                class="nav-link {% if request.resolver_match.url_name == 'note_list' %}active{% endif %}">
+                    Notes
+                </a>
+                <a href="{% url 'timer' %}"
+                   class="nav-link {% if request.resolver_match.url_name == 'timer' %}active{% endif %}">
+                    Timer
+                </a>
+                
+                {% if request.user.is_superuser %}
+                    <a href="/admin/" class="nav-link">Admin</a>
+                {% endif %}
+            </div>
+
+            <!-- Right Side -->
+            <div class="flex items-center gap-3">
+                <a href="{% url 'logout' %}"
+                   class="hidden sm:inline-block bg-green-600 text-white px-4 py-2 rounded-lg
+                          text-sm font-medium hover:bg-green-700 transition">
+                    Logout
+                </a>
+
+                <!-- Hamburger -->
+                <button id="menu-btn"
+                        class="sm:hidden p-2 rounded-lg hover:bg-gray-100 focus:outline-none">
+                    <svg class="w-6 h-6 text-gray-700" fill="none" stroke="currentColor"
+                         viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                              d="M4 6h16M4 12h16M4 18h16" />
+                    </svg>
+                </button>
+            </div>
+        </div>
+
+        <!-- Mobile Menu -->
+        <div id="mobile-menu"
+             class="sm:hidden hidden mt-4 border-t pt-4 space-y-2">
+
+            <a href="{% url 'home' %}" class="mobile-link">Dashboard</a>
+            <a href="{% url 'task_list' %}" class="mobile-link">Tasks</a>
+            <a href="{% url 'note_list' %}" class="mobile-link">Notes</a>
+            <a href="{% url 'timer' %}" class="mobile-link">Timer</a>
+            {% if request.user.is_superuser %}
+                <a href="/admin/" class="mobile-link">Admin</a>
+            {% endif %}
+
+            <a href="#"
+               class="block text-center mt-2 bg-green-600 text-white py-2 rounded-lg
+                      hover:bg-green-700 transition">
+                Login
+            </a>
+        </div>
+
+    </nav>
+</header>
+
+<!-- JS -->
+<script>
+    const menuBtn = document.getElementById("menu-btn");
+    const mobileMenu = document.getElementById("mobile-menu");
+
+    menuBtn.addEventListener("click", () => {
+        mobileMenu.classList.toggle("hidden");
+    });
+</script>
+
+<!-- Extra Tailwind Utility -->
+<style>
+    .nav-link {
+        font-size: 14px;
+        font-weight: 500;
+        color: #4b5563;
+        padding: 4px 2px;
+        border-bottom: 2px solid transparent;
+        transition: color 0.2s, border-color 0.2s;
+    }
+
+    .nav-link:hover {
+        color: #2563eb;
+        border-color: #2563eb;
+    }
+
+    .nav-link.active {
+        color: #16a34a;
+        border-color: #16a34a;
+    }
+
+    .mobile-link {
+        display: block;
+        padding: 10px 12px;
+        border-radius: 8px;
+        font-size: 14px;
+        font-weight: 500;
+        color: #374151;
+    }
+
+    .mobile-link:hover {
+        background-color: #f3f4f6;
+    }
+</style>

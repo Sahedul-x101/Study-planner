@@ -1,0 +1,141 @@
+{% extends "core/base.html" %}
+
+{% block title %}Study Planner | Notes{% endblock %}
+
+{% block content %}
+
+<div class="max-w-7xl mx-auto px-4 py-6">
+
+    <!-- Header -->
+    <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-8 gap-4">
+        <div>
+            <h2 class="text-3xl font-bold text-gray-800">My Notes</h2>
+            <p class="text-gray-500 mt-1">Notes to Change</p>
+        </div>
+
+        <!-- New Note Button -->
+        <button onclick="openModal()"
+                class="inline-flex items-center gap-2 bg-green-600 text-white px-5 py-2.5 rounded-lg
+                       hover:bg-green-700 shadow-lg transition-transform transform hover:scale-105">
+            <i class="fa-solid fa-plus"></i>
+            New Note
+        </button>
+    </div>
+
+    {% if notes %}
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+
+        {% for note in notes %}
+        <div class="group rounded-2xl shadow-md border border-gray-200 p-6
+                    hover:shadow-2xl hover:-translate-y-1 transition-all duration-300
+                    flex flex-col h-full"
+             style="background: {{ note.color }}">
+
+            <!-- Title + Delete -->
+            <div class="flex justify-between items-start mb-4">
+                <h3 class="text-lg font-semibold text-gray-900 leading-snug">
+                    {{ note.title }}
+                </h3>
+                <button onclick="deleteNote({{ note.id }})"
+                        class="text-gray-700 hover:text-red-600 text-sm">✕</button>
+            </div>
+
+            <!-- Content -->
+            <p class="text-gray-900 text-sm leading-relaxed mb-4 flex-grow break-words">
+                {{ note.content }}
+            </p>
+
+            <!-- Footer -->
+            <div class="mt-auto pt-4 border-t border-gray-100 flex justify-between items-center">
+                <span class="text-xs text-gray-500">
+                    Created {{ note.created_at|timesince }} ago
+                </span>
+            </div>
+        </div>
+        {% endfor %}
+
+    </div>
+    {% else %}
+    <!-- Empty State -->
+    <div class="bg-white rounded-2xl shadow-md border border-gray-200 p-16 text-center">
+        <div class="text-6xl mb-4 animate-bounce">📝</div>
+        <h3 class="text-2xl font-semibold text-gray-700 mb-3">
+            No notes yet!
+        </h3>
+        <p class="text-gray-500 mb-6">
+            Start creating notes to organize your ideas.
+        </p>
+
+        <button onclick="openModal()"
+                class="inline-flex items-center gap-2 bg-green-600 text-white px-6 py-3 rounded-lg
+                       hover:bg-green-700 shadow-lg transition">
+            <i class="fa-solid fa-plus"></i>
+            Create your first note
+        </button>
+    </div>
+    {% endif %}
+
+</div>
+
+<!-- Modal -->
+<div id="noteModal" class="fixed inset-0 flex items-center justify-center hidden z-50">
+    <div class="bg-white rounded-2xl p-6 shadow-2xl w-96 relative">
+
+        <button onclick="closeModal()"
+                class="absolute top-3 right-3 text-gray-500 hover:text-gray-800 text-lg font-bold">✕</button>
+
+        <h2 class="text-xl font-semibold mb-4">Create Note</h2>
+
+        <form method="post">
+            {% csrf_token %}
+            <input type="text" name="title" placeholder="Title"
+                   class="w-full border rounded-lg px-3 py-2 mb-3 focus:outline-none focus:ring-2 focus:ring-green-500" required>
+
+            <!-- Bigger description box -->
+            <textarea name="content" placeholder="Write something..."
+                      class="w-full border rounded-lg px-3 py-3 mb-4 h-40 resize-none focus:outline-none focus:ring-2 focus:ring-green-500" required></textarea>
+
+            <!-- 5 Color Palette (Default: yellow) -->
+            <div class="flex gap-3 mb-4">
+                <div class="w-6 h-6 rounded-full cursor-pointer border-2 border-black"
+                     style="background:#fde68a" onclick="selectColor(this)"></div>
+                <div class="w-6 h-6 rounded-full cursor-pointer" style="background:#4ade80" onclick="selectColor(this)"></div>
+                <div class="w-6 h-6 rounded-full cursor-pointer" style="background:#fca5a5" onclick="selectColor(this)"></div>
+                <div class="w-6 h-6 rounded-full cursor-pointer" style="background:#a5f3fc" onclick="selectColor(this)"></div>
+                <div class="w-6 h-6 rounded-full cursor-pointer" style="background:#ddd6fe" onclick="selectColor(this)"></div>
+            </div>
+
+            <input type="hidden" name="color" id="selectedColor" value="#fde68a">
+
+            <button type="submit" class="w-full bg-green-600 text-white py-2 rounded-lg hover:bg-green-700 transition">
+                Create Note
+            </button>
+        </form>
+    </div>
+</div>
+
+<script>
+    function openModal() {
+        document.getElementById("noteModal").classList.remove("hidden");
+    }
+
+    function closeModal() {
+        document.getElementById("noteModal").classList.add("hidden");
+    }
+
+    function selectColor(element) {
+        document.querySelectorAll("#noteModal .w-6").forEach(c => c.classList.remove("border-2","border-black"));
+        element.classList.add("border-2","border-black");
+        document.getElementById("selectedColor").value = element.style.backgroundColor;
+    }
+
+    function deleteNote(id) {
+        fetch(`/notes/delete/${id}/`).then(() => location.reload());
+    }
+
+    // Close modal on ESC key
+    document.addEventListener('keydown', function(event) {
+        if(event.key === "Escape") closeModal();
+    });
+</script>
+{% endblock %}

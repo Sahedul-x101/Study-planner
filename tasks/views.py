@@ -1,9 +1,11 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from tasks.models import Task
 from django.utils import timezone
+from django.contrib.auth.decorators import login_required
 
 
 # Create your views here.
+@login_required
 def create_tasks(request):
     if request.method == "POST":
         title = request.POST.get('title')
@@ -43,11 +45,11 @@ def create_tasks(request):
             
     return render(request, "tasks/create_task.html")
 
-
+@login_required
 def tasks_list(request):
     tasks = Task.objects.filter(completed=False).order_by('-created_at')
 
-    return render(request, "tasks/task_list.html", {"tasks":tasks})
+    return render(request, "tasks/task_list.html", {"tasks":tasks, "show_header": True})
 
 def mark_complete(request, task_id):
     task = get_object_or_404(Task, id=task_id)
@@ -55,4 +57,9 @@ def mark_complete(request, task_id):
     task.completed_at = timezone.now()
     task.save()
 
-    return redirect("task_list")
+    return redirect(request.META.get('HTTP_REFERER', 'task_list'))
+
+
+    
+
+        

@@ -21,7 +21,9 @@ from django.conf import settings
 urlpatterns = [
     path('', include('core.urls')),
     path('tasks/', include('tasks.urls')),
-    path('admin/', admin.site.urls)
+    path('user/', include('user.urls')),
+    path('notes/', include('notes.urls')),
+    path('admin/', admin.site.urls),
 ] 
 if settings.DEBUG:
     import debug_toolbar
